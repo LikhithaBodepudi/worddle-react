@@ -13,6 +13,7 @@ export default function App(){
   const [currentGuess,setCurrentGuess]=useState("");
   const [gameOver,setGameOver]=useState(false);
   const [message,setMessage]=useState("");
+  const [submittedRow, setSubmittedRow] = useState(-1);
 
   // to set a randomword from words file as a secretword or the answer of the worddle
   useEffect(()=>{
@@ -75,6 +76,7 @@ export default function App(){
 
     const newGuesses=[...guesses,currentGuess];
     setGuesses(newGuesses);
+    setSubmittedRow(newGuesses.length - 1);
     setCurrentGuess("");
 
     if(secretWord==currentGuess){
@@ -115,6 +117,9 @@ export default function App(){
   const renderGrid = () => {
   const cells = [];
   for (let row = 0; row < MAX_GUESSES; row++) {
+
+    const isFlipping = row === submittedRow;
+
     let guess = guesses[row] || "";
 
     if (row === guesses.length) {
@@ -133,7 +138,7 @@ export default function App(){
     for (let col = 0; col < WORD_LENGTH; col++) {
       const letter = guess[col] || "";
       cells.push(
-        <Cell key={`${row}-${col}`} letter={letter} color={colors[col]} isCurrentRow={isCurrentRow} />
+        <Cell key={`${row}-${col}`} letter={letter} color={colors[col]} isCurrentRow={isCurrentRow} isFlipping={isFlipping}/>
       );
     }
   }

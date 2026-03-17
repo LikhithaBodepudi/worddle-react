@@ -1,8 +1,9 @@
-export default function Cell({ letter, color,isCurrentRow}) {
+export default function Cell({ letter, color,isCurrentRow,isFlipping}) {
   const borderColor = isCurrentRow ? "#ffffff" : "#3a3a3c";
   const boxShadow = isCurrentRow ? "0 0 5px #ffffff" : "none";
   return (
     <div
+      className={isFlipping ? "flip" : ""}
       style={{
         width: "60px",
         height: "60px",
