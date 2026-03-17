@@ -20,6 +20,11 @@ h1 {
   letter-spacing: 4px;
 }
 
+p {
+  color: #bbb;
+  font-size: 14px;
+}
+
 .cell {
   transition: transform 0.4s;
 }

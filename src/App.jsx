@@ -13,13 +13,43 @@ export default function App(){
   const [currentGuess,setCurrentGuess]=useState("");
   const [gameOver,setGameOver]=useState(false);
   const [message,setMessage]=useState("");
- // const [charCount,setcharCount]=useState([]);
 
   // to set a randomword from words file as a secretword or the answer of the worddle
   useEffect(()=>{
     const randomWord=WORDS[Math.floor(Math.random()*WORDS.length)];
     setSecretWord(randomWord);
   },[])
+
+  //keyboard event listner
+  useEffect(()=>{
+    const handleKeyPress=(e)=>{
+       if(gameOver) return;
+       const key= e.key.toUpperCase();
+
+       if(e.key.length==1 && key>="A" && key<="Z"){
+        if(currentGuess.length<WORD_LENGTH){
+          setCurrentGuess(prev=>prev+key);
+        }
+       }
+
+       if(e.key==="Backspace"){
+        setCurrentGuess(prev=>prev.slice(0,-1));
+       }
+
+       if(e.key==="Enter"){ 
+        if (currentGuess.length === WORD_LENGTH) {
+          submitGuess();
+        }
+       }
+    };
+
+     window.addEventListener("keydown", handleKeyPress);
+
+     return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+     };
+
+  },[currentGuess,gameOver]);
 
   const handleInputChange=(e)=>{
     if(gameOver) return;
@@ -39,8 +69,8 @@ export default function App(){
 
 };
 
-  const handleSubmit=(e)=>{
-    e.preventDefault();
+  const submitGuess=()=>{
+   
     if(currentGuess.length!=WORD_LENGTH) return;
 
     const newGuesses=[...guesses,currentGuess];
@@ -58,7 +88,7 @@ export default function App(){
   };
 
   const getColors = (guess, secret) => {
-  const result = Array(WORD_LENGTH).fill("lightCoral");
+  const result = Array(WORD_LENGTH).fill("lightcoral");
   const secretPool = secret.split(""); // tracks remaining unmatched letters
 
   // Pass 1: greens
@@ -85,13 +115,25 @@ export default function App(){
   const renderGrid = () => {
   const cells = [];
   for (let row = 0; row < MAX_GUESSES; row++) {
-    const guess = guesses[row] || "";
-    const colors = guess ? getColors(guess, secretWord) : Array(WORD_LENGTH).fill("");
+    let guess = guesses[row] || "";
+
+    if (row === guesses.length) {
+      guess = currentGuess;
+    }
+
+    const isCurrentRow = row === guesses.length;
+
+    let colors =  Array(WORD_LENGTH).fill("");
+
+    // Only apply colors to submitted guesses
+    if (row < guesses.length) {
+      colors = getColors(guess, secretWord);
+    }
 
     for (let col = 0; col < WORD_LENGTH; col++) {
       const letter = guess[col] || "";
       cells.push(
-        <Cell key={`${row}-${col}`} letter={letter} color={colors[col]} />
+        <Cell key={`${row}-${col}`} letter={letter} color={colors[col]} isCurrentRow={isCurrentRow} />
       );
     }
   }
@@ -102,27 +144,13 @@ export default function App(){
     <div className='app-container'>
       <h1>Wordle Clone</h1>
 
+      <p>Type letters on your keyboard and press Enter</p>
+
       <div className="grid">
         {renderGrid()}
       </div>
 
-      <form onSubmit={handleSubmit} className="form">
-        <input
-        type="text"
-        onChange={handleInputChange}
-        value={currentGuess}
-        maxLength={WORD_LENGTH}
-        disabled={gameOver}
-        style={{
-          padding: "10px",
-          fontSize: "18px",
-          textAlign: "center",
-          letterSpacing: "5px",
-          marginTop: "20px"
-       }}
-        />
-        <button type="submit">Guess</button>
-      </form>
+      
 
       {message && (<h2 className="message">{message}</h2>)}
 

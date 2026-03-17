@@ -8,5 +8,6 @@ export const WORDS = [
   "LIGHT",
   "SMILE",
   "HOUSE",
-  "CLOUD"
+  "CLOUD",
+  "ERROR"
 ];
