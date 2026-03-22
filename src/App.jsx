@@ -1,6 +1,7 @@
 import React,{useState,useEffect} from "react";
 import { WORDS } from "./words";
 import Cell from "./components/Cell";
+import Keyboard from "./components/Keyboard";
 import "./styles.css";
 
 const WORD_LENGTH=5;
@@ -14,6 +15,7 @@ export default function App(){
   const [gameOver,setGameOver]=useState(false);
   const [message,setMessage]=useState("");
   const [submittedRow, setSubmittedRow] = useState(-1);
+  const [keyColors, setKeyColors] = useState({});
 
   // to set a randomword from words file as a secretword or the answer of the worddle
   useEffect(()=>{
@@ -87,6 +89,29 @@ export default function App(){
       setMessage("You lost! Word was "+secretWord);
       setGameOver(true);
     }
+
+    const colors = getColors(currentGuess, secretWord);
+
+    const newKeyColors = { ...keyColors };
+
+    for (let i = 0; i < WORD_LENGTH; i++) {
+      const letter = currentGuess[i];
+
+      const priority = {
+        green: 3,
+        gold: 2,
+        lightcoral: 1
+      };
+
+      if (
+        !newKeyColors[letter] ||
+        priority[colors[i]] > priority[newKeyColors[letter]]
+      ) {
+        newKeyColors[letter] = colors[i];
+      }
+    }
+
+    setKeyColors(newKeyColors);
   };
 
   const getColors = (guess, secret) => {
@@ -145,6 +170,23 @@ export default function App(){
   return cells;
 };
 
+const handleVirtualKey = (key) => {
+
+  if (gameOver) return;
+
+  if (key === "ENTER") {
+    submitGuess();
+  }
+  else if (key === "BACKSPACE") {
+    setCurrentGuess(prev => prev.slice(0, -1));
+  }
+  else {
+    if (currentGuess.length < WORD_LENGTH) {
+      setCurrentGuess(prev => prev + key);
+    }
+  }
+};
+
   return(
     <div className='app-container'>
       <h1>Wordle Clone</h1>
@@ -154,6 +196,8 @@ export default function App(){
       <div className="grid">
         {renderGrid()}
       </div>
+
+      <Keyboard onKeyPress={handleVirtualKey} keyColors={keyColors} />
 
       
 
