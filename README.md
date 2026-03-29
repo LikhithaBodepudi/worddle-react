@@ -1,16 +1,50 @@
-# React + Vite
+Wordle Clone (React)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simplified Wordle-style game built using React.
+Guess the hidden 5-letter word within 6 attempts!
 
-Currently, two official plugins are available:
+Features
+5x6 grid gameplay (5-letter words, 6 attempts)
+Physical keyboard + on-screen keyboard support
+Color feedback:
+🟩 Green → correct letter, correct position
+🟨 Yellow → correct letter, wrong position
+🟥 Red → letter not in word
+New Game reset functionality
+Tile flip animation (one-by-one reveal)
+Handles duplicate letters correctly
+Keyboard color updates based on guesses
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+🛠️ Tech Stack
+React (Hooks: useState, useEffect, useCallback)
+JavaScript (ES6+)
+CSS (Grid + Animations)
 
-## React Compiler
+How to Play
+Type a 5-letter word using your keyboard
+Press Enter to submit
+Colors will indicate:
+🟩 Correct letter & position
+🟨 Correct letter, wrong position
+🟥 Not in word
+You have 6 attempts to guess the word
+Click New Game to restart
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Key Concepts Implemented:
+React state management
+Controlled input via keyboard events
+Dynamic grid rendering using loops
+Animation timing using setTimeout
+Handling duplicate letters correctly
+Conditional rendering for game states
 
-## Expanding the ESLint configuration
+Challenges Solved:
+Fixing duplicate letter coloring logic
+Preventing state overwrite during animation
+Ensuring animation triggers only for submitted rows
+Resetting full game state correctly
+Synchronizing UI with React state updates
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Acknowledgements
+
+Inspired by the original Wordle game.

@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useCallback} from "react";
 import { WORDS } from "./words";
 import Cell from "./components/Cell";
 import Keyboard from "./components/Keyboard";
@@ -16,6 +16,7 @@ export default function App(){
   const [message,setMessage]=useState("");
   const [submittedRow, setSubmittedRow] = useState(-1);
   const [keyColors, setKeyColors] = useState({});
+  const [revealedTiles, setRevealedTiles] = useState([]);
 
   // to set a randomword from words file as a secretword or the answer of the worddle
   useEffect(()=>{
@@ -61,8 +62,7 @@ export default function App(){
 
   const resetGame = () => {
 
-  const randomWord =
-    WORDS[Math.floor(Math.random() * WORDS.length)];
+  const randomWord =WORDS[Math.floor(Math.random() * WORDS.length)];
 
   setSecretWord(randomWord);
   setGuesses([]);
@@ -70,18 +70,26 @@ export default function App(){
   setGameOver(false);
   setMessage("");
 
+  setSubmittedRow(-1);
+  setRevealedTiles([]);
+  setKeyColors({});
+
 };
 
-  const submitGuess=()=>{
+  const submitGuess=useCallback(()=>{
    
     if(currentGuess.length!=WORD_LENGTH) return;
 
-    const newGuesses=[...guesses,currentGuess];
-    setGuesses(newGuesses);
-    setSubmittedRow(newGuesses.length - 1);
-    setCurrentGuess("");
+    const guess = currentGuess;  // store first
 
-    if(secretWord==currentGuess){
+    const newGuesses = [...guesses, guess];
+    setGuesses(newGuesses);
+    setCurrentGuess("");
+    setSubmittedRow(newGuesses.length - 1);
+
+    const colors = getColors(guess, secretWord);
+
+    if(secretWord===guess){
       setMessage("You Won the Game,Congrats!");
       setGameOver(true);
     }
@@ -90,12 +98,17 @@ export default function App(){
       setGameOver(true);
     }
 
-    const colors = getColors(currentGuess, secretWord);
+    setRevealedTiles([]); // reset
 
+    for (let i = 0; i < WORD_LENGTH; i++) {
+      setTimeout(() => {
+        setRevealedTiles((prev) => [...prev, i]);
+      }, i * 300); // delay per tile
+    }
     const newKeyColors = { ...keyColors };
 
     for (let i = 0; i < WORD_LENGTH; i++) {
-      const letter = currentGuess[i];
+      const letter = guess[i];
 
       const priority = {
         green: 3,
@@ -112,7 +125,7 @@ export default function App(){
     }
 
     setKeyColors(newKeyColors);
-  };
+  },[currentGuess,guesses,secretWord,keyColors]);
 
   const getColors = (guess, secret) => {
   const result = Array(WORD_LENGTH).fill("lightcoral");
@@ -144,11 +157,12 @@ export default function App(){
   for (let row = 0; row < MAX_GUESSES; row++) {
 
     const isFlipping = row === submittedRow;
+    
 
     let guess = guesses[row] || "";
 
-    if (row === guesses.length) {
-      guess = currentGuess;
+    if (row === guesses.length && !gameOver) {
+          guess = currentGuess;
     }
 
     const isCurrentRow = row === guesses.length;
@@ -161,9 +175,10 @@ export default function App(){
     }
 
     for (let col = 0; col < WORD_LENGTH; col++) {
+      const isRevealed = row === submittedRow && revealedTiles.includes(col);
       const letter = guess[col] || "";
       cells.push(
-        <Cell key={`${row}-${col}`} letter={letter} color={colors[col]} isCurrentRow={isCurrentRow} isFlipping={isFlipping}/>
+        <Cell key={`${row}-${col}`} letter={letter} color={colors[col]} isCurrentRow={isCurrentRow} isFlipping={isFlipping} isRevealed={isRevealed}/>
       );
     }
   }
